@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load event_filters %}
+
+{% block title %}Lista de Eventos{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-5 fw-bold">
+            <i class="bi bi-calendar-event text-primary"></i> 
+            Eventos Disponibles
+        </h1>
+        <p class="lead text-muted">Explora y regístrate a eventos increíbles</p>
+    </div>
+    {% if perms.events.add_event %}
+    <div class="col-auto">
+        <a href="{% url 'event_create' %}" class="btn btn-primary btn-lg">
+            <i class="bi bi-plus-circle"></i> Crear Evento
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Filtros de usuario -->
+<div class="card mb-4 border-0 shadow-sm">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h5 class="mb-0">
+                    <i class="bi bi-funnel"></i> Tu perfil:
+                    <span class="badge bg-info text-dark">
+                        {% for group in user.groups.all %}
+                            {{ group.name }}
+                        {% empty %}
+                            Sin grupo asignado
+                        {% endfor %}
+                    </span>
+                </h5>
+            </div>
+            <div class="col-md-6 text-end">
+                <small class="text-muted">
+                    <i class="bi bi-eye"></i> 
+                    Mostrando {{ events|length }} evento{{ events|length|pluralize }}
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if events %}
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for event in events %}
+    <div class="col">
+        <div class="card h-100 border-0 shadow-sm card-hover">
+            <!-- Header del card con color según tipo -->
+            <div class="card-header {% if event.event_type == 'conference' %}bg-primary{% elif event.event_type == 'concert' %}bg-danger{% else %}bg-success{% endif %} text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>
+                        <i class="bi bi-bookmark"></i>
+                        {{ event.get_event_type_display }}
+                    </span>
+                    {% if event.is_private %}
+                        <span class="badge bg-warning text-dark">
+                            <i class="bi bi-lock-fill"></i> Privado
+                        </span>
+                    {% else %}
+                        <span class="badge bg-light text-dark">
+                            <i class="bi bi-globe"></i> Público
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card-body">
+                <h5 class="card-title fw-bold">{{ event.title }}</h5>
+                <p class="card-text text-muted">{{ event.description|truncatewords:20 }}</p>
+
+                <ul class="list-unstyled small">
+                    <li class="mb-2">
+                        <i class="bi bi-calendar3 text-primary"></i>
+                        <strong>Fecha:</strong> {{ event.date|date:"d/m/Y H:i" }}
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-geo-alt text-danger"></i>
+                        <strong>Lugar:</strong> {{ event.location }}
+                    </li>
+                    <li class="mb-2">
+                        <i class="bi bi-person-badge text-success"></i>
+                        <strong>Organizador:</strong> {{ event.organizer.username }}
+                    </li>
+                    <li>
+                        <i class="bi bi-people text-info"></i>
+                        <strong>Asistentes:</strong> {{ event.attendees.count }}
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card-footer bg-white border-top">
+                <div class="d-flex gap-2 flex-wrap">
+                    {% if user in event.attendees.all %}
+                        <button class="btn btn-success btn-sm" disabled>
+                            <i class="bi bi-check-circle-fill"></i> Registrado
+                        </button>
+                    {% else %}
+                        <a href="{% url 'register_attendance' event.pk %}" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-person-plus"></i> Registrarme
+                        </a>
+                    {% endif %}
+
+                    {% if perms.events.change_event %}
+                        {% if user|can_edit_event:event %}
+                            <a href="{% url 'event_update' event.pk %}" class="btn btn-outline-warning btn-sm">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                        {% endif %}
+                    {% endif %}
+
+                    {% if perms.events.delete_event %}
+                        {% if user|has_group:"Administradores" %}
+                            <a href="{% url 'event_delete' event.pk %}" class="btn btn-outline-danger btn-sm">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </a>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5">
+    <div class="mb-4">
+        <i class="bi bi-inbox" style="font-size: 5rem; color: #ddd;"></i>
+    </div>
+    <h3 class="text-muted">No hay eventos disponibles</h3>
+    <p class="text-muted">Sé el primero en crear un evento</p>
+    {% if perms.events.add_event %}
+    <a href="{% url 'event_create' %}" class="btn btn-primary btn-lg mt-3">
+        <i class="bi bi-plus-circle"></i> Crear Primer Evento
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
