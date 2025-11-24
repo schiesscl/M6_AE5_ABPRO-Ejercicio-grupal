@@ -1,6 +1,7 @@
 # Plataforma de Gestión de Eventos
 
 ## Hans Schiess
+## Linwi Vargas
 
 ## Descripción del Proyecto
 
