@@ -10,6 +10,7 @@ La **Plataforma de Gestión de Eventos** es una aplicación web desarrollada en 
 
 - **Gestión de Eventos CRUD**: Crear, leer, actualizar y eliminar eventos
 - **Sistema de Roles**: Tres niveles de permisos (Administradores, Organizadores, Asistentes)
+- **Registro de Usuarios**: Creación de cuentas nuevas con asignación automática de rol "Asistente"
 - **Eventos Privados**: Control de visibilidad de eventos según permisos
 - **Registro de Asistencia**: Los usuarios pueden registrarse a eventos
 - **Interfaz Bootstrap 5**: Diseño moderno y responsivo
@@ -64,7 +65,8 @@ M6_AE5_ABPRO-Ejercicio grupal/
 │   ├── management/          # Comandos personalizados de Django
 │   │   └── commands/
 │   │       ├── setup_permissions.py    # Configuración de grupos y permisos
-│   │       └── create_test_users.py    # Creación de usuarios de prueba
+│   │       ├── create_test_users.py    # Creación de usuarios de prueba
+│   │       └── check_permissions.py    # Verificación de permisos en BD
 │   ├── templatetags/        # Filtros personalizados para templates
 │   │   └── event_filters.py
 │   ├── __init__.py
@@ -312,6 +314,16 @@ Este comando creará usuarios de ejemplo:
 - **organizador** / `org123` (Organizador)
 - **asistente** / `asist123` (Asistente)
 
+También crea 3 eventos de ejemplo.
+
+### `check_permissions`
+
+Herramienta de auditoría para verificar la integridad de los permisos.
+
+```bash
+python manage.py check_permissions
+```
+
 ### 8. Iniciar el Servidor
 
 ```bash
@@ -326,6 +338,7 @@ La aplicación estará disponible en: **http://127.0.0.1:8000/**
 
 | URL          | Descripción                               |
 | ------------ | ------------------------------------------ |
+| `/signup/` | Página de registro de nuevos usuarios    |
 | `/login/`  | Página de inicio de sesión               |
 | `/logout/` | Cerrar sesión (POST)                      |
 | `/admin/`  | Panel de administración de Django         |
@@ -414,6 +427,14 @@ python manage.py create_test_users
 - `asistente` (Asistente)
 
 También crea 3 eventos de ejemplo.
+
+### `check_permissions`
+
+Herramienta de auditoría para verificar la integridad de los permisos.
+
+```bash
+python manage.py check_permissions
+```
 
 ## Pruebas
 
